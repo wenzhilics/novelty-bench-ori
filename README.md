@@ -120,7 +120,7 @@ uv run python src/summarize.py --eval-dir results/$SPLIT/$MODEL_NAME
   - `partition.py`: Implements response partitioning algorithms
   - `score.py`: Computes utility scores using reward model
   - `summarize.py`: Summarize evaluation results
-- `data/`: Contains curated and wildchat datasets
+- `data/`: Contains curated and wildchat datasets, human annotations, and classifier training data
 - `evaluation/`: Contains evaluation results for leaderboard participation. We have provided an example submission.
 
 ## 🏆 Leaderboard Participation

@@ -176,6 +176,9 @@ data/*
 !data/readme.txt
 !data/curated.jsonl
 !data/wildchat-1k.jsonl
+!data/humans.jsonl
+!data/train.jsonl
+!data/val.jsonl
 eval*/
 slurm_output/
 *.tar.gz
