@@ -150,6 +150,14 @@ If you are interested in submitting your model to the NoveltyBench Leaderboard, 
           - summary.json
     ```
 5. Create a pull request to this repository with the new folder.
+6. (Optional) To get attribution on the leaderboard, include in your PR description:
+   ```json
+   {
+     "paper": "https://arxiv.org/abs/...",
+     "model": "https://huggingface.co/...",
+     "authors": "LastName et al."
+   }
+   ```
 
 The NoveltyBench team will:
 - Review and merge your submission;
