@@ -1,3 +1,8 @@
+# Measure utility. Use LLM judge to score the leader of each equivalence class, weighted average by order of appearance, to measure the utility of the entire answer sequence.
+# python src/score.py --eval-dir results/curated/qwen3b --patience 0.8
+# Two 48G GPUs minimum! 27B model as judge.
+# Get scores.jsonl
+
 import argparse
 import asyncio
 import bisect
@@ -71,6 +76,7 @@ async def score_partition_rm(
         tokenize=True,
         padding=True,
         truncation=True,
+        max_length=1024,
         return_tensors="pt",
         return_dict=True,
     ).to(rm.device)

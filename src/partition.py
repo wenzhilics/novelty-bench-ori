@@ -1,3 +1,7 @@
+# Measure diversity. Equivalence check, whether two answers express the same meaning. Leader algorithm. Complexity O(NK), K is the number of equivalence classes.
+# python src/partition.py --eval-dir results/curated/qwen3b --alg classifier
+# Get partitions.jsonl
+
 import argparse
 import asyncio
 import functools
@@ -16,7 +20,7 @@ from rouge_score import rouge_scorer
 from tqdm.auto import tqdm
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-from src.common import oai_client
+from common import oai_client
 
 CONCURRENT_REQUESTS = 1
 

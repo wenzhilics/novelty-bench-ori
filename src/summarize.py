@@ -1,3 +1,7 @@
+# Save two metrics in a file.
+# python src/summarize.py --eval-dir results/curated/qwen3b
+# Get summary.json
+
 import argparse
 import json
 import os

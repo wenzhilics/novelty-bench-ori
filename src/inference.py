@@ -1,3 +1,8 @@
+# Generate N answers for each question using different sampling strategies. In-context regeneration is among them.
+# Only enable transformers mode for local inference.
+# python src/inference.py --mode transformers --model Qwen/Qwen2.5-3B-Instruct --data curated --eval-dir results/curated/qwen3b --sampling in-context --num-generations 10
+# Get generations.jsonl
+
 import argparse
 import asyncio
 import json
@@ -5,19 +10,19 @@ import os
 import time
 from abc import ABC, abstractmethod
 
-import cohere
+#import cohere
 import torch
 from aiofiles import open as aio_open
-from anthropic import AsyncAnthropicVertex
+#from anthropic import AsyncAnthropicVertex
 from datasets import load_dataset
-from google import genai
-from google.auth import default, transport
-from google.genai import types
-from openai import AsyncOpenAI
+#from google import genai
+#from google.auth import default, transport
+#from google.genai import types
+#from openai import AsyncOpenAI
 from tqdm.auto import tqdm
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
-from src.common import oai_client
+from common import oai_client
 
 
 class InferenceService(ABC):
@@ -177,7 +182,7 @@ class TransformersService(InferenceService):
             self.model = AutoModelForCausalLM.from_pretrained(
                 model, 
                 trust_remote_code=True,
-                dtype=torch.bfloat16,
+                torch_dtype=torch.bfloat16,
                 device_map="auto",
                 attn_implementation="flash_attention_2"  # Use flash attention if available
             )
@@ -186,7 +191,7 @@ class TransformersService(InferenceService):
             self.model = AutoModelForCausalLM.from_pretrained(
                 model, 
                 trust_remote_code=True,
-                dtype=torch.bfloat16,
+                torch_dtype=torch.bfloat16,
                 device_map="auto",
                 attn_implementation="eager",
                 stop=["<|end_of_text|>", "<eos>", "<end_of_turn>"] # need to be overridden for other models
@@ -264,7 +269,8 @@ class TransformersService(InferenceService):
                 print(f"Generating response {i+1}/{n}...")
                 with torch.no_grad():
                     outputs = self.model.generate(
-                        **inputs,
+                        input_ids=inputs,
+                        attention_mask=torch.ones_like(inputs),
                         max_new_tokens=max_tokens,
                         temperature=temperature,
                         do_sample=True if temperature > 0 else False,
@@ -275,7 +281,7 @@ class TransformersService(InferenceService):
                     )
                     
                     # Decode only the generated part
-                    generated_tokens = outputs[0][inputs['input_ids'].shape[1]:]
+                    generated_tokens = outputs[0][inputs.shape[1]:]
                     response = self.tokenizer.decode(generated_tokens, skip_special_tokens=True)
                     
                     # Apply stop sequences
@@ -287,7 +293,8 @@ class TransformersService(InferenceService):
                     response = response.strip()
                     responses.append(response)
                     print(f"Generated: {response[:100]}...")
-        
+
+
         return responses
     
     def cleanup(self):
@@ -387,7 +394,7 @@ async def run_generation(
             # Exponential backoff
             wait_time = min(5 * 2**attempt, 60)  # 5, 10, 20, 40, 60, 60, ... seconds
             print(
-                f"Attempt {attempt + 1} failed, retrying in {wait_time} seconds...",
+                f"Attempt {attempt + 1} failed: {e}, retrying in {wait_time} seconds...",
                 flush=True,
             )
             await asyncio.sleep(wait_time)
